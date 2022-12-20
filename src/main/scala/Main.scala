@@ -6,29 +6,18 @@ import cats.effect.unsafe.implicits.global
 
 import scala.io.StdIn
 
-object MyApp{
+object MyApp extends IOApp {
   object Console {
     def putStrLn(s: String): IO[Unit] = IO(println(s))
     def readLine(text: String): IO[String] = IO(StdIn.readLine(text))
   }
 
-  def main(args: Array[String]):Unit = {
-    import Console._ 
-
-    val program1 = readLine("Enter your name:").flatMap { name =>
-      putStrLn(s"Hello $name") 
-    }
- 
-    val program2 = for {
-      name <- readLine("Enter you name: ")
-      _ <- putStrLn(s"Hello $name")
-    } yield ()
-
-    val program3 = putStrLn("hello") *> putStrLn("world")
-
-    // IO monad test
-    program1.unsafeRunSync() 
-    program2.unsafeRunSync()
-    program3.unsafeRunSync()
+  override def run(args: List[String]): IO[ExitCode] = {
+    import Console._
+    for {
+      s <- readLine("enter somthing:") 
+      t <- readLine("enter another thing:")
+      _ <- putStrLn(s ++ t)
+    } yield ExitCode.Success
   }
 }
