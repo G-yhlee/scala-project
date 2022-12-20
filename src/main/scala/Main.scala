@@ -1,22 +1,34 @@
-import cats.effect.{IO, IOApp}
-import scala.concurrent.duration._
-// object HelloWorld extends IOApp.Simple {
-//   val run = IO.println("Hello, World!")
+import cats._
+import cats.effect._
+import cats.implicits._
+import cats.effect.implicits
+import cats.effect.unsafe.implicits.global
 
-// }
+import scala.io.StdIn
 
-object StupidFizzBuzz extends IOApp.Simple {
-  val run =
-    for {
-      ctr <- IO.ref(0)
+object MyApp{
+  object Console {
+    def putStrLn(s: String): IO[Unit] = IO(println(s))
+    def readLine(text: String): IO[String] = IO(StdIn.readLine(text))
+  }
 
-      wait = IO.sleep(1.second)
-      poll = wait *> ctr.get
+  def main(args: Array[String]):Unit = {
+    import Console._ 
 
-      _ <- poll.flatMap(IO.println(_)).foreverM.start
-      _ <- poll.map(_ % 3 == 0).ifM(IO.println("fizz"), IO.unit).foreverM.start
-      _ <- poll.map(_ % 5 == 0).ifM(IO.println("buzz"), IO.unit).foreverM.start
-
-      _ <- (wait *> ctr.update(_ + 1)).foreverM.void
+    val program1 = readLine("Enter your name:").flatMap { name =>
+      putStrLn(s"Hello $name") 
+    }
+ 
+    val program2 = for {
+      name <- readLine("Enter you name: ")
+      _ <- putStrLn(s"Hello $name")
     } yield ()
+
+    val program3 = putStrLn("hello") *> putStrLn("world")
+
+    // IO monad test
+    program1.unsafeRunSync() 
+    program2.unsafeRunSync()
+    program3.unsafeRunSync()
+  }
 }
