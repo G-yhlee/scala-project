@@ -12,12 +12,19 @@ object MyApp extends IOApp {
     def readLine(text: String): IO[String] = IO(StdIn.readLine(text))
   }
 
+  import Console._
+
+  def echoForever: IO[Nothing] = {
+    val program = for {
+      line <- readLine("Enter a line: ")
+      _ <- putStrLn(line)
+    } yield ()
+
+    program.foreverM
+  }
+
   override def run(args: List[String]): IO[ExitCode] = {
-    import Console._
-    for {
-      s <- readLine("enter somthing:") 
-      t <- readLine("enter another thing:")
-      _ <- putStrLn(s ++ t)
-    } yield ExitCode.Success
+    // echoForever.map(_=> ExitCode.Success)
+    echoForever.as(ExitCode.Success)
   }
 }
